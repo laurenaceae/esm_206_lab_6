@@ -14,7 +14,7 @@ library(broom)
 library(equatiomatic)
 ```
 
-## Rank-based text example
+## Rank-based test example
 
 Mann-Whitney U (non-parametric alternative to an unpaired 2-sample t-test)
 - H0: equal ranks (or medians)
@@ -54,3 +54,53 @@ mwu <- wilcox.test(gp_1, gp_2)
 This p-value means that if our samples are drawn from a population with the same median, there is a `r round(mwu$p.value, 2)` probability of finding samples medians at least as different as ours by random chance
 
 No significant difference in medians (Mann Whitney U; U = `r mwu$statistic`, p-value = `r round(mwu$p.value, 2)`)
+
+## Simple linear regression
+
+Two *continuous quantitative* variables you are trying to understand the relationship between, and you think that a linear relationship makes sense
+
+Use `penguins` data from {palmerpenguins}, exploring flipper length (x) versus body mass (y)
+
+```{r}
+# Use View(penguins) to see the data
+# Make an exploratory scatter plot of penguin flipper length vs body mass 
+ggplot(data = penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+### Find the model estimates (coefficients)
+
+Use the `lm()` funciton for a linear model
+```{r}
+penguin_lm <- lm(body_mass_g ~ flipper_length_mm, data = penguins)
+```
+
+`r penguin_lm$coefficients[1]`
+
+### Use `broom::tidy()` to get a tidy output from lm()
+```{r}
+penguin_lm_tidy <- tidy(penguin_lm)
+
+penguin_lm_tidy
+```
+
+### Use `broom::glance()` to get output of model fit and statistical significance
+```{r}
+penguin_lm_glance <- glance(penguin_lm)
+
+penguin_lm_glance
+```
+
+### Use equatiomatics::extract_eq() to return the model in LaTeX
+
+```{r}
+extract_eq(model = penguin_lm, use_coefs = TRUE)
+```
+
+### Use `plot()` function to automatically produce diagnostic plots
+
+```{r}
+plot(penguin_lm)
+```
+
